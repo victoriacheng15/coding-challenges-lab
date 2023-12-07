@@ -1,28 +1,17 @@
 import fs from "fs";
 
-
 export class WC {
-  constructor() {}
+	constructor() {}
 
-  logger(...args) {
-  }
+	logger(...args) {}
 
-  fileReader(file) {
-  }
+	fileReader(file) {}
 
-  countBytes(file) {
+	countBytes(file) {}
 
-  }
+	countLines(file) {}
 
-  countLines(file) {
+	countWords(file) {}
 
-  }
-
-  countWords(file) {
-
-  }
-
-  countCharacters(file) {
-
-  }
+	countCharacters(file) {}
 }
