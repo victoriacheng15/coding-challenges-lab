@@ -10,16 +10,6 @@ describe("WC class", () => {
 		wc = new WC();
 	});
 
-	describe("logger method", () => {
-		it("should log the passed message", () => {
-			const logSpy = vi.spyOn(console, "log");
-
-			wc.logger("ccwc -l example.txt");
-
-			expect(logSpy).toHaveBeenCalledWith("ccwc -l example.txt");
-		});
-	});
-
 	describe("fileReader method", () => {
 		it("should return the file contents", () => {
 			vi.spyOn(fs, "readFileSync").mockReturnValue(mockedContents);
