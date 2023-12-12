@@ -1,7 +1,5 @@
 # Coding Challenges - Write Your Own wc Tool
 
-# Write your own wc tool
-
 This project implements a custom version of the Unix wc tool in JavaScript: ccwc. Like the original wc, it allows you to:
 
 - Count the number of bytes in a file
