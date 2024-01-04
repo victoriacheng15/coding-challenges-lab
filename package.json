@@ -9,7 +9,7 @@
     "test": "vitest"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bin": {
     "ccwc": "src/index.js"
   },
