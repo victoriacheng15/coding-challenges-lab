@@ -2,8 +2,8 @@ import {
 	getStats,
 	getStatsFromData,
 	createOptions,
+	checkFlag,
 	validateFile,
 } from "./process.js";
-import { checkFlag } from "./checkFlag.js";
 
 export { getStats, getStatsFromData, createOptions, checkFlag, validateFile };

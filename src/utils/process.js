@@ -31,12 +31,19 @@ export function createOptions(bytes, lines, words, chars, file) {
 	return options;
 }
 
+export function checkFlag(args, obj) {
+	const selectedFlag = args.find((flag) => obj.hasOwnProperty(flag));
+	if (selectedFlag) {
+		console.log(obj[selectedFlag]);
+	}
+}
+
 export function validateFile(args) {
 	const file = args.at(-1);
 	if (!file) {
-		console.error(
-			"Error: No file provided. Please provide a file path or piped input.",
-		);
+		const errorStr =
+			"Error: No file provided. Please provide a file path or piped input.";
+		console.error(errorStr);
 		process.exit(1);
 	}
 	return file;
