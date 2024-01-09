@@ -19,7 +19,13 @@ git clone git@github.com:victoriacheng15/cc-write-your-wc-tool.git
 cd cc-write-your-wc-tool
 ```
 
-2. Run the command
+2. Set up
+
+```
+npm link
+```
+
+3. Run the command
 
 ```
 ccwc -m example.txt
