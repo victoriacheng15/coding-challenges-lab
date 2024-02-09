@@ -1,5 +1,29 @@
 use std::{env, fs, io};
 
+fn display_help() {
+    println!("This is a cat command line tool built with Rust!");
+    println!();
+    println!("cargo run -- [OPTION] [FILE]");
+    println!();
+    println!("Examples:");
+    println!("cargo run -- <file>");
+    println!("head -n3 <file> | cargo run -- -");
+    println!("head -n3 <file> | cargo run -- -n");
+    println!("sed G <file> | cargo run -- -b");
+    println!("sed G <file> | cargo run -- -b | head -n5");
+    println!();
+    println!("Options:");
+    println!();
+    println!("-n - display number on all output lines");
+    println!();
+    println!("-b - display number on nonempty output lines");
+    println!();
+    println!("--help - display this help");
+    println!();
+    println!("Thank you for checking this tool out! :D");
+    println!();
+}
+
 fn read_from_stdin() -> Result<String, io::Error> {
     let mut contents = String::new();
     for line in io::stdin().lines() {
@@ -35,6 +59,7 @@ fn main() -> Result<(), io::Error> {
 
     if args.len() < 1 {
         println!("Usage: cargo run -- [option] <file> <file2>");
+        println!("Not sure what to do? type cargo run -- --help");
         std::process::exit(1)
     }
 
@@ -43,10 +68,7 @@ fn main() -> Result<(), io::Error> {
             let contents = read_from_stdin()?;
             process_input(contents, display_line_number, no_number_on_blank)
         } else if filename == "--help" {
-            println!("helpful text")
-            // -n display all number on output lines
-            // -b number on nonempty output lines
-            // --help display this help
+            display_help();
         } else {
             let contents = fs::read_to_string(filename)?;
             process_input(contents, display_line_number, no_number_on_blank)
