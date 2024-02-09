@@ -1,5 +1,12 @@
 use std::{env, fs, io};
 
+fn process_input(contents: String) {
+    for line in contents.lines() {
+        let trimmed_line = line.trim();
+        println!("{trimmed_line}")
+    }
+}
+
 fn main() -> Result<(), io::Error> {
     let args: Vec<String> = env::args().skip(1).collect();
 
@@ -20,7 +27,7 @@ fn main() -> Result<(), io::Error> {
             println!("{contents}")
         } else {
             let contents = fs::read_to_string(filename)?;
-            println!("{contents}")
+            process_input(contents)
         }
     }
 
