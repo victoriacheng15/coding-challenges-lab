@@ -8,11 +8,16 @@ fn main() -> Result<(), io::Error> {
         std::process::exit(1)
     }
 
-    println!("{:?}", args);
+    // println!("{:?}", args);
 
     for filename in args {
-        if filename == "" {
-            println!("no action yet")
+        if filename == "-" {
+            let mut contents = String::new();
+            for line in io::stdin().lines() {
+                contents.push_str(&line?);
+                contents.push_str("\n");
+            }
+            println!("{contents}")
         } else {
             let contents = fs::read_to_string(filename)?;
             println!("{contents}")
