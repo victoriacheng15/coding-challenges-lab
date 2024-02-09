@@ -1,5 +1,15 @@
 use std::{env, fs, io};
 
+fn read_from_stdin() -> Result<String, io::Error> {
+    let mut contents = String::new();
+    for line in io::stdin().lines() {
+        contents.push_str(&line?);
+        contents.push_str("\n")
+    }
+
+    Ok(contents)
+}
+
 fn process_input(contents: String, display_line_number: bool, no_number_on_blank: bool) {
     let mut line_number = 1;
 
@@ -24,21 +34,19 @@ fn main() -> Result<(), io::Error> {
     let no_number_on_blank = args.iter().any(|arg| arg == "-b");
 
     if args.len() < 1 {
-        println!("Usage: cargo run -- <file>");
+        println!("Usage: cargo run -- [option] <file> <file2>");
         std::process::exit(1)
     }
 
-    // println!("{:?}", args);
-
     for filename in args {
         if filename == "-" || filename == "-n" || filename == "-b" {
-            let mut contents = String::new();
-            for line in io::stdin().lines() {
-                contents.push_str(&line?);
-                contents.push_str("\n");
-            }
-            // println!("{filename}");
+            let contents = read_from_stdin()?;
             process_input(contents, display_line_number, no_number_on_blank)
+        } else if filename == "--help" {
+            println!("helpful text")
+            // -n display all number on output lines
+            // -b number on nonempty output lines
+            // --help display this help
         } else {
             let contents = fs::read_to_string(filename)?;
             process_input(contents, display_line_number, no_number_on_blank)
