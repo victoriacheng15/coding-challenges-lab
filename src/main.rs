@@ -20,9 +20,16 @@ fn main() -> Result<(), io::Error> {
     }
 
     if args.len() > 1 {
-        let filename = args.iter().rev().next().unwrap();
-        let contents = fs::read_to_string(filename)?;
-        process_input(contents, display_line_number, no_number_on_blank);
+        let filenames = args
+            .iter()
+            .filter(|arg| !arg.contains("-"))
+            .collect::<Vec<&String>>();
+        let mut all_contents = String::new();
+        for filename in filenames {
+            let contents = fs::read_to_string(filename)?;
+            all_contents.push_str(&contents)
+        }
+        process_input(all_contents, display_line_number, no_number_on_blank)
     } else {
         let contents = read_from_stdin()?;
         process_input(contents, display_line_number, no_number_on_blank)
