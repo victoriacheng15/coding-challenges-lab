@@ -14,16 +14,17 @@ fn main() -> Result<(), io::Error> {
         process::exit(1)
     }
 
+    let filenames = args
+        .iter()
+        .filter(|arg| !arg.contains("-"))
+        .collect::<Vec<&String>>();
+
     if help_option {
         display_help();
         process::exit(1)
     }
 
-    if args.len() > 1 {
-        let filenames = args
-            .iter()
-            .filter(|arg| !arg.contains("-"))
-            .collect::<Vec<&String>>();
+    if filenames.len() >= 1 {
         let mut all_contents = String::new();
         for filename in filenames {
             let contents = fs::read_to_string(filename)?;
