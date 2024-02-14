@@ -54,15 +54,15 @@ sed G test.txt | cargo run -- -b
 sed G test.txt | cargo run -- -b | head -n5
 ```
 
-## What I learned from this?
+## What did I learn from this?
 
 Initially, I faced a setback where the code couldn't process a single file only (e.g., `cargo run -- test.txt`).
 
-After debugging and investigating, I was able to pinpointed where went wrong. The root cause was the `args` length, I was checking for a minimum of two arguements.
+After debugging and investigating with logging, I was able to pinpoint where went wrong. The root cause was the `args` length, I was checking for a minimum of two arguments.
 
-What was the fix? Instead of checking on arguments length where an option may be included, focus on filtering the `args` array to have file name(s). This allows to focus and check on file name(s) solely in the array.
+What was the fix? Instead of checking on argument length where an option may be included, focus on filtering the `args` array to have file name(s). This allows us to focus and check on the file name(s) solely in the array.
 
-While seeminlky simple, it took time to fix. A good lesson from this: always take breaks! Cannot go wrong with this. When stuck, stepping away clears your head and prevents diving down endless debugging rabbit holes.
+While seemingly simple, it took time to fix. A good lesson from this: always take breaks! Cannot go wrong with this. When stuck, stepping away clears your head and prevents diving down endless debugging rabbit holes.
 
 ## Links
 
