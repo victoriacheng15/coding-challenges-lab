@@ -56,13 +56,16 @@ sed G test.txt | cargo run -- -b | head -n5
 
 ## What did I learn from this?
 
-Initially, I faced a setback where the code couldn't process a single file only (e.g., `cargo run -- test.txt`).
+Initially, I encountered a setback where the code wouldn't process a single file only (e.g., `cargo run -- test.txt`).
 
-After debugging and investigating with logging, I was able to pinpoint where went wrong. The root cause was the `args` length, I was checking for a minimum of two arguments.
+After debugging with logging, I zeroed in on the culprit: the `args` length. I had been checking for a minimum of two arguments. This was the reason why the program wouldn’t process a single file.
 
-What was the fix? Instead of checking on argument length where an option may be included, focus on filtering the `args` array to have file name(s). This allows us to focus and check on the file name(s) solely in the array.
+What was the fix? To effectively read contents from files, we need the files themselves. Thereforce, I ensured the `args` array exclusively contains file paths. This way, I can directly determine the number of files provided. If files exist, the program retrieves their contents; otherwise, it reads from standard input.
 
-While seemingly simple, it took time to fix. A good lesson from this: always take breaks! Cannot go wrong with this. When stuck, stepping away clears your head and prevents diving down endless debugging rabbit holes.
+Key Takeaways:
+- Take breaks to refresh your perspective. Stepping away can help you see things differently and identify solutions.
+- Utilize a process of elimination to isolate the root cause. Systematically rule out possibilities until you pinpoint the issue.
+
 
 ## Links
 
