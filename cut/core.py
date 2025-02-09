@@ -1,14 +1,3 @@
-import sys
-import argparse
-
-"""
-A Python implementation of the Unix `cut` command.
-
-This script allows users to extract specific fields from a file or input stream,
-using a specified delimiter. It supports both file input and piped input (stdin).
-"""
-
-
 def validate_field(value):
     """
     Validates a field value, ensuring it is a positive integer.
@@ -73,50 +62,3 @@ def cut(input_stream, delimiter, fields):
         parts = line.strip().split(delimiter)
         selected_fields = [parts[i - 1] for i in fields if i - 1 < len(parts)]
         print(delimiter.join(selected_fields))
-
-
-def main():
-    """
-    Parses command-line arguments and processes the input (file or stdin).
-
-    Example:
-        # Process a file
-        python3 main.py input.csv -d, -f1,2
-
-        # Process piped input
-        tail -n5 input.csv | python3 main.py -d, -f1,2
-    """
-    # create argument parser
-    parser = argparse.ArgumentParser(
-        description="A Python implementation of the cut command."
-    )
-
-    # add arguments
-    parser.add_argument("filename", type=str, nargs="?", help="The file to process.")
-    parser.add_argument(
-        "-d",
-        "--delimiter",
-        type=str,
-        default="\t",
-        help="Field delimiter (default is tab).",
-    )
-    parser.add_argument(
-        "-f",
-        "--fields",
-        type=parse_fields,
-        required=True,
-        help="Fields to select (e.g., 1,2,3).",
-    )
-
-    # parse arguments
-    args = parser.parse_args()
-
-    if args.filename:
-        with open(args.filename, "r") as file:
-            cut(file, args.delimiter, args.fields)
-    else:
-        cut(sys.stdin, args.delimiter, args.fields)
-
-
-if __name__ == "__main__":
-    main()
