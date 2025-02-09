@@ -10,6 +10,11 @@ def validate_field(value):
   except ValueError:
     raise argparse.ArgumentTypeError(f"Invalid field value: {value}. Must be an integer.")
 
+def parse_fields(field_input):
+  normalized_input = field_input.replace(" ", ",")
+  fields = normalized_input.split(",")
+  return [validate_field(field) for field in fields]
+
 def cut(filename, delimiter, fields):
   try:
     with open(filename, 'r') as f:
@@ -32,15 +37,12 @@ def main():
     # add arguments
     parser.add_argument('filename', type=str, help="The file to process.")
     parser.add_argument('-d', '--delimiter', type=str, default='\t', help="Field delimiter (default is tab).")
-    parser.add_argument('-f', '--fields', type=lambda x: [validate_field(f) for f in x.split(',')], required=True, help="Fields to select (e.g., 1,2,3).")
+    parser.add_argument('-f', '--fields', type=parse_fields, required=True, help="Fields to select (e.g., 1,2,3).")
 
     # parse arguments
     args = parser.parse_args()
-    print(args.fields)
-    # fields = list(map(int, args.fields.split()))
 
-    # cut(args.filename, args.delimiter, fields)
-
+    cut(args.filename, args.delimiter, args.fields)
 
 if __name__ == "__main__":
     main()
