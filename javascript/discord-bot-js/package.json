@@ -1,0 +1,22 @@
+{
+  "name": "weather-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/bot.js",
+  "scripts": {
+    "dev": "node --watch src/bot.js",
+    "format": "npx @biomejs/biome format src/ --write",
+    "start": "node src/bot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.2"
+  }
+}
