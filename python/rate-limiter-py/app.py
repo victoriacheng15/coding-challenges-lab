@@ -6,30 +6,29 @@ app = Flask(__name__)
 WINDOW_SIZE = 60
 MAX_REQUESTS = 60
 
-request_counters = {}
+request_logs  = {}
 
 def is_request_allowed(ip):
     now = time.time()
-    current_window = int(now // WINDOW_SIZE)
-    next_window_start = (current_window + 1) * WINDOW_SIZE 
-    reset_in = int(next_window_start - now)
+    reset_in = WINDOW_SIZE
 
-    if ip not in request_counters:
-        request_counters[ip] = {}
+    if ip not in request_logs:
+        request_logs[ip] = []
 
-    if current_window not in request_counters[ip]:
-        request_counters[ip][current_window] = 0
+    recent_requests = [ts for ts in request_logs[ip] if now - ts < WINDOW_SIZE]
+    request_logs[ip] = recent_requests
 
-    count = request_counters[ip][current_window]
-
-    if count < MAX_REQUESTS:
-        request_counters[ip][current_window] += 1
+    if len(recent_requests) < MAX_REQUESTS:
+        request_logs[ip].append(now)
+        remaining = MAX_REQUESTS - len(request_logs[ip])
+        reset_in = int(WINDOW_SIZE - (now - request_logs[ip][0])) if request_logs[ip] else WINDOW_SIZE
         return {
             "allowed": True,
-            "remaining": MAX_REQUESTS - count,
+            "remaining": remaining,
             "reset_in_seconds": reset_in
         }
     else:
+        reset_in = int(WINDOW_SIZE - (now - request_logs[ip][0])) if request_logs[ip] else WINDOW_SIZE
         return {
             "allowed": False,
             "remaining": 0,
@@ -68,17 +67,19 @@ def unlimited():
 @app.route('/stats')
 def stats_home():
     now = time.time()
-    current_window = int(now // WINDOW_SIZE)
-
     snapshot = {}
-    for ip, windows in request_counters.items():
-        if current_window in windows:
-            snapshot[ip] = {
-                "requests_in_current_window": windows[current_window],
-                "max_requests": MAX_REQUESTS,
-                "remaining": max(MAX_REQUESTS - windows[current_window], 0),
-                "reset_in_seconds": int((current_window + 1) * WINDOW_SIZE - now)
-            }
+
+    for ip, logs in request_logs.items():
+        active_logs = [ts for ts in logs if now - ts < WINDOW_SIZE]
+        remaining = max(MAX_REQUESTS - len(active_logs), 0)
+        reset_in = int(WINDOW_SIZE - (now - active_logs[0])) if active_logs else WINDOW_SIZE
+
+        snapshot[ip] = {
+            "requests_in_last_60_seconds": len(active_logs),
+            "max_requests": MAX_REQUESTS,
+            "remaining": remaining,
+            "reset_in_seconds": reset_in
+        }
 
     return jsonify(snapshot), 200
 
