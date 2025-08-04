@@ -6,35 +6,48 @@ app = Flask(__name__)
 WINDOW_SIZE = 60
 MAX_REQUESTS = 60
 
-request_logs  = {}
+# Store counters per IP address
+# Format: { ip: { current_period: count, previous_period: count } }
+request_counters = {}
 
-def is_request_allowed(ip):
-    now = time.time()
-    reset_in = WINDOW_SIZE
+def is_request_allowed(ip, now=None):
+    if now is None:
+        now = time.time()
+    current_period = int(now // WINDOW_SIZE)
+    elapsed_in_window = now % WINDOW_SIZE
+    weight = elapsed_in_window / WINDOW_SIZE
+    previous_period = current_period - 1
 
-    if ip not in request_logs:
-        request_logs[ip] = []
+    if ip not in request_counters:
+        request_counters[ip] = {}
 
-    recent_requests = [ts for ts in request_logs[ip] if now - ts < WINDOW_SIZE]
-    request_logs[ip] = recent_requests
+    # Default counts to 0
+    current_count = request_counters[ip].get(current_period, 0)
+    previous_count = request_counters[ip].get(previous_period, 0)
 
-    if len(recent_requests) < MAX_REQUESTS:
-        request_logs[ip].append(now)
-        remaining = MAX_REQUESTS - len(request_logs[ip])
-        reset_in = int(WINDOW_SIZE - (now - request_logs[ip][0])) if request_logs[ip] else WINDOW_SIZE
+    # Weighted total
+    total = current_count + (1 - weight) * previous_count
+
+    if total < MAX_REQUESTS:
+        request_counters[ip][current_period] = current_count + 1
+
         return {
             "allowed": True,
-            "remaining": remaining,
-            "reset_in_seconds": reset_in
+            "remaining": max(int(MAX_REQUESTS - total), 0),
+            "reset_in_seconds": int(WINDOW_SIZE - elapsed_in_window)
         }
     else:
-        reset_in = int(WINDOW_SIZE - (now - request_logs[ip][0])) if request_logs[ip] else WINDOW_SIZE
         return {
             "allowed": False,
             "remaining": 0,
-            "reset_in_seconds": reset_in
+            "reset_in_seconds": int(WINDOW_SIZE - elapsed_in_window)
         }
-
+    
+def get_client_ip():
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip and ',' in ip:
+        ip = ip.split(',')[0].strip()
+    return ip
 
 @app.route('/')
 def index():
@@ -43,7 +56,7 @@ def index():
 
 @app.route('/limited')
 def limited():
-    ip = request.remote_addr
+    ip = get_client_ip()
     result = is_request_allowed(ip)
 
     if result["allowed"]:
@@ -67,22 +80,22 @@ def unlimited():
 @app.route('/stats')
 def stats_home():
     now = time.time()
+    current_period = int(now // WINDOW_SIZE)
+    previous_period = current_period - 1
+    reset_in_seconds = int((current_period + 1) * WINDOW_SIZE - now)
+
     snapshot = {}
-
-    for ip, logs in request_logs.items():
-        active_logs = [ts for ts in logs if now - ts < WINDOW_SIZE]
-        remaining = max(MAX_REQUESTS - len(active_logs), 0)
-        reset_in = int(WINDOW_SIZE - (now - active_logs[0])) if active_logs else WINDOW_SIZE
-
+    for ip, windows in request_counters.items():
+        cur = windows.get(current_period, 0)
+        prev = windows.get(previous_period, 0)
         snapshot[ip] = {
-            "requests_in_last_60_seconds": len(active_logs),
+            "current_period": cur,
+            "previous_period": prev,
             "max_requests": MAX_REQUESTS,
-            "remaining": remaining,
-            "reset_in_seconds": reset_in
+            "reset_in_seconds": reset_in_seconds
         }
 
     return jsonify(snapshot), 200
-
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
