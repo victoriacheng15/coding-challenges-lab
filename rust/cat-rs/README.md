@@ -11,9 +11,9 @@ This is a Rust version of the UNIX cat tool. Like the original cat tool, it allo
 1. Installation
 
 ```bash
-git clone git@github.com:victoriacheng15/cc-cat-rs.git
+git clone git@github.com:victoriacheng15/coding-challenges-lab.git
 
-cd cc-cat-rs
+cd rust/cat-rs
 ```
 
 2. Have Rust on your computer?

@@ -28,13 +28,13 @@ Through this project, I gained hands-on experience with:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/victoriacheng15/cc-cut-py.git
+git clone git@github.com:victoriacheng15/coding-challenges-lab.git
 ```
 
 2. Navigate to the project directory:
 
 ```bash
-cd cut-command
+cd python/cut-py
 ```
 
 3. Setup a virtual environment (optional but recommended):
@@ -89,7 +89,7 @@ python -m cut.cli --help
 ## Project Structure
 
 ```
-cut-command/
+cut-py/
 │
 ├── cut/                      # Main package
 │   ├── __init__.py           # Makes the folder a Python package
