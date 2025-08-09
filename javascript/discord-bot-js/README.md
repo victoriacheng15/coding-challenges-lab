@@ -6,15 +6,15 @@ Discord is a platform where everyone in the server can communicate through voice
 
 1. Installation
 
-```
-git clone git@github.com:victoriacheng15/cc-write-your-discord-bot.git
+```bash
+git clone git@github.com:victoriacheng15/coding-challenges-lab.git
 
-cd cc-write-your-discord-bot
+cd javascript/discord-bot-js
 ```
 
 2. configaturation
 
-```
+```bash
 mv .env.exmaple .env
 ```
 
@@ -45,7 +45,7 @@ These settings are for the auto message feature, which sends a weather update to
 
 Ensure that Docker and Docker Desktop are installed on your machine by following the guide available [here](https://docs.docker.com/desktop/)
 
-```
+```bash
 docker run -d --name=discord-bot .
 ```
 

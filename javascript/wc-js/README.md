@@ -13,21 +13,21 @@ This implementation provides a fun and practical way to explore JavaScript and i
 
 1. Installation
 
-```
-git clone git@github.com:victoriacheng15/cc-write-your-wc-tool.git
+```bash
+git clone git@github.com:victoriacheng15/coding-challenges-lab.git
 
-cd cc-write-your-wc-tool
+cd javascript/wc-js
 ```
 
 2. Set up
 
-```
+```bash
 npm link
 ```
 
 3. Run the command
 
-```
+```bash
 ccwc -m example.txt
 ```
 
