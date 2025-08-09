@@ -1,11 +1,10 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
 	"os"
+
+	"wc-go/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -25,9 +24,22 @@ var rootCmd = &cobra.Command{
 	Short: "Count lines, words, and bytes in files or stdin",
 	Long:  `wc-go is a simple command-line tool written in Go that counts lines, words, and bytes in input files or standard input. You can pass one or more files as arguments, or pipe input to it. If no flags are provided, wc-go prints all counts.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// For now, just print which flags are set and the args
-		fmt.Printf("Flags set - Lines: %v, Words: %v, Bytes: %v\n", flags.Lines, flags.Words, flags.Bytes)
-		fmt.Printf("Args: %v\n", args)
+		if err := utils.ValidateArgs(args); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		for _, filename := range args {
+			data, err := os.ReadFile(filename)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", filename, err)
+				continue
+			}
+
+			if flags.Bytes {
+				fmt.Printf("%8d %s\n", len(data), filename)
+			}
+		}
 	},
 }
 
