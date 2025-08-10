@@ -36,8 +36,26 @@ var rootCmd = &cobra.Command{
 				continue
 			}
 
-			if flags.Bytes {
+			switch {
+			case flags.Bytes:
 				fmt.Printf("%8d %s\n", len(data), filename)
+			case flags.Lines:
+				lines := 0
+				for _, b := range data {
+					if b == '\n' {
+						lines++
+					}
+
+					if len(data) > 0 && data[len(data)-1] != '\n' {
+						lines++
+					}
+				}
+
+				fmt.Printf("%8d %s\n", lines, filename)
+			case flags.Words:
+				fmt.Println("Printing words....")
+			default:
+				fmt.Println("Printing all....")
 			}
 		}
 	},
