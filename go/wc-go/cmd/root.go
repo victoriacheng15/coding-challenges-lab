@@ -13,6 +13,7 @@ type Flags struct {
 	Lines bool
 	Words bool
 	Bytes bool
+	Chars bool
 }
 
 var (
@@ -38,22 +39,13 @@ var rootCmd = &cobra.Command{
 
 			switch {
 			case flags.Bytes:
-				fmt.Printf("%8d %s\n", len(data), filename)
+				fmt.Printf("%8d %s\n", utils.CountBytes(data), filename)
 			case flags.Lines:
-				lines := 0
-				for _, b := range data {
-					if b == '\n' {
-						lines++
-					}
-
-					if len(data) > 0 && data[len(data)-1] != '\n' {
-						lines++
-					}
-				}
-
-				fmt.Printf("%8d %s\n", lines, filename)
+				fmt.Printf("%8d %s\n", utils.CountLines(data), filename)
 			case flags.Words:
 				fmt.Println("Printing words....")
+			case flags.Chars:
+				fmt.Println("Printing chars....")
 			default:
 				fmt.Println("Printing all....")
 			}
@@ -72,4 +64,5 @@ func init() {
 	rootCmd.Flags().BoolVarP(&flags.Lines, "lines", "l", false, "print the line counts")
 	rootCmd.Flags().BoolVarP(&flags.Words, "words", "w", false, "print the word counts")
 	rootCmd.Flags().BoolVarP(&flags.Bytes, "bytes", "c", false, "print the byte counts")
+	rootCmd.Flags().BoolVarP(&flags.Bytes, "chars", "m", false, "print the character counts")
 }

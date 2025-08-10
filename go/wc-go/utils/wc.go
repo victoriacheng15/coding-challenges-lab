@@ -1,0 +1,35 @@
+package utils
+
+func CountBytes(data []byte) int {
+	return len(data)
+}
+
+func CountLines(data []byte) int {
+	lines := 0
+	for _, b := range data {
+		if b == '\n' {
+			lines++
+		}
+
+		if len(data) > 0 && data[len(data)-1] != '\n' {
+			lines++
+		}
+	}
+
+	return lines
+}
+
+func CountWords(data []byte) int {
+	// TODO: implement
+	return 0
+}
+
+func CountChars(data []byte) int {
+	// TODO: implement
+	return 0
+}
+
+func FormatDefault(data []byte, name string) string {
+	// TODO: implement
+	return ""
+}
