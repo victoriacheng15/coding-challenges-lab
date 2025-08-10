@@ -1,5 +1,7 @@
 package utils
 
+import "unicode"
+
 func CountBytes(data []byte) int {
 	return len(data)
 }
@@ -20,8 +22,19 @@ func CountLines(data []byte) int {
 }
 
 func CountWords(data []byte) int {
-	// TODO: implement
-	return 0
+	inWord := false
+	count := 0
+
+	for _, item := range string(data) {
+		if unicode.IsSpace(item) {
+			inWord = false
+		} else if !inWord {
+			inWord = true
+			count++
+		}
+	}
+
+	return count
 }
 
 func CountChars(data []byte) int {

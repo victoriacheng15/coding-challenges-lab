@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 			case flags.Lines:
 				fmt.Printf("%8d %s\n", utils.CountLines(data), filename)
 			case flags.Words:
-				fmt.Println("Printing words....")
+				fmt.Printf("%8d %s\n", utils.CountWords(data), filename)
 			case flags.Chars:
 				fmt.Println("Printing chars....")
 			default:
