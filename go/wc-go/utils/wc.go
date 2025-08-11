@@ -39,7 +39,6 @@ func CountWords(data []byte) int {
 
 func CountChars(data []byte) int {
 	return len([]rune(string(data)))
-	// return len(data)
 }
 
 func FormatDefault(data []byte, name string) string {
