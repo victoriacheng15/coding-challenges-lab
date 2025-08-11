@@ -45,7 +45,7 @@ var rootCmd = &cobra.Command{
 			case flags.Words:
 				fmt.Printf("%8d %s\n", utils.CountWords(data), filename)
 			case flags.Chars:
-				fmt.Println("Printing chars....")
+				fmt.Printf("%8d %s\n", utils.CountChars(data), filename)
 			default:
 				fmt.Println("Printing all....")
 			}
@@ -64,5 +64,5 @@ func init() {
 	rootCmd.Flags().BoolVarP(&flags.Lines, "lines", "l", false, "print the line counts")
 	rootCmd.Flags().BoolVarP(&flags.Words, "words", "w", false, "print the word counts")
 	rootCmd.Flags().BoolVarP(&flags.Bytes, "bytes", "c", false, "print the byte counts")
-	rootCmd.Flags().BoolVarP(&flags.Bytes, "chars", "m", false, "print the character counts")
+	rootCmd.Flags().BoolVarP(&flags.Chars, "chars", "m", false, "print the character counts")
 }

@@ -25,7 +25,7 @@ func TestBasicCounts(t *testing.T) {
 		{"bytes", utils.CountBytes, 49},
 		{"lines", utils.CountLines, 3},
 		{"words", utils.CountWords, 7},
-		// {"chars", utils.CountChars, 49},
+		{"chars", utils.CountChars, 49},
 	}
 
 	for _, tt := range tests {
