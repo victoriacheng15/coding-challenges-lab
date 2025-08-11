@@ -47,7 +47,7 @@ var rootCmd = &cobra.Command{
 			case flags.Chars:
 				fmt.Printf("%8d %s\n", utils.CountChars(data), filename)
 			default:
-				fmt.Println("Printing all....")
+				fmt.Println(utils.FormatDefault(data, filename))
 			}
 		}
 	},

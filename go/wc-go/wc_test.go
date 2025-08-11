@@ -6,8 +6,6 @@ import (
 	"wc-go/utils"
 )
 
-const sampleText = "Hello world!\nGo is fun.\nTest-driven development.\n"
-
 // Expected counts for sampleText:
 // - bytes: 49
 // - lines: 3 (three '\n')
@@ -15,6 +13,7 @@ const sampleText = "Hello world!\nGo is fun.\nTest-driven development.\n"
 // - chars: 49 (ASCII only)
 
 func TestBasicCounts(t *testing.T) {
+	const sampleText = "Hello world!\nGo is fun.\nTest-driven development.\n"
 	data := []byte(sampleText)
 
 	tests := []struct {
@@ -26,6 +25,7 @@ func TestBasicCounts(t *testing.T) {
 		{"lines", utils.CountLines, 3},
 		{"words", utils.CountWords, 7},
 		{"chars", utils.CountChars, 49},
+		{"ascii chars", utils.CountChars, 49},
 	}
 
 	for _, tt := range tests {
@@ -36,11 +36,12 @@ func TestBasicCounts(t *testing.T) {
 			}
 		})
 	}
-	t.Run("ascii chars", func(t *testing.T) {
-		got := utils.CountChars(data)
-		want := 49
+
+	t.Run("default format", func(t *testing.T) {
+		want := "3 7 49 test.txt"
+		got := utils.FormatDefault(data, "test.txt")
 		if got != want {
-			t.Fatalf("CountChars = %d; want %d", got, want)
+			t.Fatalf("FormatDefault = %q; want %q", got, want)
 		}
 	})
 }
@@ -68,12 +69,3 @@ func TestUnicodeCounts(t *testing.T) {
 		})
 	}
 }
-
-// func TestDefaultOutputFormat(t *testing.T) {
-// 	data := []byte(sampleText)
-// 	want := "3 7 49 test.txt"
-// 	got := utils.FormatDefault(data, "test.txt")
-// 	if got != want {
-// 		t.Fatalf("FormatDefault = %q; want %q", got, want)
-// 	}
-// }

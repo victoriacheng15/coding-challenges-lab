@@ -1,6 +1,9 @@
 package utils
 
-import "unicode"
+import (
+	"fmt"
+	"unicode"
+)
 
 func CountBytes(data []byte) int {
 	return len(data)
@@ -42,6 +45,9 @@ func CountChars(data []byte) int {
 }
 
 func FormatDefault(data []byte, name string) string {
-	// TODO: implement
-	return ""
+	return fmt.Sprintf("%d %d %d %s",
+		CountLines(data),
+		CountWords(data),
+		CountBytes(data),
+		name)
 }
