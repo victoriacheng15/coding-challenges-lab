@@ -15,7 +15,7 @@ var rootCmd = &cobra.Command{
 	Long:  `wc-go is a simple command-line tool written in Go that counts lines, words, and bytes in input files or standard input. You can pass one or more files as arguments, or pipe input to it. If no flags are provided, wc-go prints all counts.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			data := utils.ReadContent("/dev/stdin", "stdin")
+			data := utils.ReadContent(os.Stdin, "stdin")
 			utils.PrintCounts(data, "")
 		} else {
 
