@@ -27,6 +27,7 @@ func CountLines(data []byte) int {
 			lines++
 		}
 	}
+
 	if len(data) > 0 && data[len(data)-1] != '\n' {
 		lines++
 	}
