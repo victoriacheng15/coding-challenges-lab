@@ -15,6 +15,11 @@ A custom implementation of the Unix `wc` (word count) tool in JavaScript, suppor
 ### cut Tool (cut-py)
 A Python implementation of the Unix `cut` command for extracting fields from files/streams, showcasing `argparse` for CLI and `pytest` for testing.
 
+## Go
+
+### wc Tool (wc-go)
+A Go implementation of the Unix wc command that counts bytes, lines, words, and characters, developed with test-driven design.
+
 ## Rust
 
 ### cat Tool (cat-rs)
