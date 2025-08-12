@@ -5,6 +5,17 @@ import (
 	"unicode"
 )
 
+type Flags struct {
+	Lines bool
+	Words bool
+	Bytes bool
+	Chars bool
+}
+
+var (
+	WcFlags Flags
+)
+
 func CountBytes(data []byte) int {
 	return len(data)
 }
@@ -50,4 +61,19 @@ func FormatDefault(data []byte, name string) string {
 		CountWords(data),
 		CountBytes(data),
 		name)
+}
+
+func PrintCounts(data []byte, name string) {
+	switch {
+	case WcFlags.Bytes:
+		fmt.Printf("%8d %s\n", CountBytes(data), name)
+	case WcFlags.Lines:
+		fmt.Printf("%8d %s\n", CountLines(data), name)
+	case WcFlags.Words:
+		fmt.Printf("%8d %s\n", CountWords(data), name)
+	case WcFlags.Chars:
+		fmt.Printf("%8d %s\n", CountChars(data), name)
+	default:
+		fmt.Println(FormatDefault(data, name))
+	}
 }

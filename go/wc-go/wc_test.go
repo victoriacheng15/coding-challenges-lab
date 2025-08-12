@@ -69,3 +69,36 @@ func TestUnicodeCounts(t *testing.T) {
 		})
 	}
 }
+
+func TestStdinInput(t *testing.T) {
+	const stdinSample = "line 1\nline 2\nline 3\n"
+	data := []byte(stdinSample)
+
+	tests := []struct {
+		name    string
+		countFn func([]byte) int
+		want    int
+	}{
+		{"bytes", utils.CountBytes, 21},
+		{"lines", utils.CountLines, 3},
+		{"words", utils.CountWords, 6},
+		{"chars", utils.CountChars, 21},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.countFn(data)
+			if got != tt.want {
+				t.Fatalf("%s = %d; want %d", tt.name, got, tt.want)
+			}
+		})
+	}
+
+	t.Run("default format with stdin", func(t *testing.T) {
+		want := "3 6 21 "
+		got := utils.FormatDefault(data, "")
+		if got != want {
+			t.Fatalf("FormatDefault = %q; want %q", got, want)
+		}
+	})
+}
