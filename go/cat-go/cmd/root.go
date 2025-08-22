@@ -10,9 +10,9 @@ import (
 )
 
 type Flags struct {
-	numberNonBlank bool
-	numberLines    bool
-	showEnds       bool
+	NumberNonBlank bool
+	NumberLines    bool
+	ShowEnds       bool
 }
 
 var catFlags Flags
@@ -20,13 +20,13 @@ var catFlags Flags
 // formatLine applies the formatting flags to a line and returns the formatted output
 func formatLine(line string, lineNumber *int) string {
 	originalLine := line
-	
+
 	// Add $ at end if showEnds flag is set
-	if catFlags.showEnds {
+	if catFlags.ShowEnds {
 		line += "$"
 	}
-	
-	if catFlags.numberNonBlank {
+
+	if catFlags.NumberNonBlank {
 		if len(originalLine) > 0 { // Check original line for emptiness
 			result := fmt.Sprintf("%6d\t%s", *lineNumber, line)
 			*lineNumber++
@@ -34,7 +34,7 @@ func formatLine(line string, lineNumber *int) string {
 		} else {
 			return line // This will just be "$" if showEnds is true
 		}
-	} else if catFlags.numberLines {
+	} else if catFlags.NumberLines {
 		result := fmt.Sprintf("%6d\t%s", *lineNumber, line)
 		*lineNumber++
 		return result
@@ -56,7 +56,7 @@ func processInput(reader io.Reader, lineNumber *int) error {
 var rootCmd = &cobra.Command{
 	Use:   "cat-go [flag] [file...]",
 	Short: "Concatenate files and print to standard output",
-	Long: `Concatenate and print files to standard output. It can be used to display the content of one or more files. If no file is specified, it reads from standard input.`,
+	Long:  `Concatenate and print files to standard output. It can be used to display the content of one or more files. If no file is specified, it reads from standard input.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		lineNumber := 1
 		if len(args) == 0 {
@@ -98,9 +98,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolVarP(&catFlags.numberNonBlank, "number-nonblank", "b", false, "Number non-empty output lines")
-	rootCmd.Flags().BoolVarP(&catFlags.numberLines, "number", "n", false, "Number all output lines")
-	rootCmd.Flags().BoolVarP(&catFlags.showEnds, "show-ends", "E", false, "Display $ at end of each line")
+	rootCmd.Flags().BoolVarP(&catFlags.NumberNonBlank, "number-nonblank", "b", false, "Number non-empty output lines")
+	rootCmd.Flags().BoolVarP(&catFlags.NumberLines, "number", "n", false, "Number all output lines")
+	rootCmd.Flags().BoolVarP(&catFlags.ShowEnds, "show-ends", "E", false, "Display $ at end of each line")
 }
-
-
