@@ -22,11 +22,36 @@ var rootCmd = &cobra.Command{
 	Long: `Concatenate and print files to standard output. It can be used to display the content of one or more files. If no file is specified, it reads from standard input.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			fmt.Println("No files specified, reading from stdin")
+			// Read from standard input
+			scanner := bufio.NewScanner(os.Stdin)
+			for scanner.Scan() {
+				line := scanner.Text()
+				// TODO: Add flag logic here later
+				// For now, just print the line
+				fmt.Println(line)
+			}
+			if err := scanner.Err(); err != nil {
+				fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
+			}
 			return
 		}
 
 		for _, filename := range args {
+			if filename == "-" {
+				// Read from standard input when "-" is specified
+				scanner := bufio.NewScanner(os.Stdin)
+				for scanner.Scan() {
+					line := scanner.Text()
+					// TODO: Add flag logic here later
+					// For now, just print the line
+					fmt.Println(line)
+				}
+				if err := scanner.Err(); err != nil {
+					fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
+				}
+				continue
+			}
+
 			file, err := os.Open(filename)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error opening file %s: %v\n", filename, err)
