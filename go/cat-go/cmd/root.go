@@ -21,14 +21,32 @@ var rootCmd = &cobra.Command{
 	Short: "Concatenate files and print to standard output",
 	Long: `Concatenate and print files to standard output. It can be used to display the content of one or more files. If no file is specified, it reads from standard input.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		lineNumber := 1
 		if len(args) == 0 {
 			// Read from standard input
 			scanner := bufio.NewScanner(os.Stdin)
 			for scanner.Scan() {
 				line := scanner.Text()
-				// TODO: Add flag logic here later
-				// For now, just print the line
-				fmt.Println(line)
+				originalLine := line
+				
+				// Add $ at end if showEnds flag is set
+				if catFlags.showEnds {
+					line += "$"
+				}
+				
+				if catFlags.numberNonBlank {
+					if len(originalLine) > 0 { // Check original line for emptiness
+						fmt.Printf("%6d\t%s\n", lineNumber, line)
+						lineNumber++
+					} else {
+						fmt.Println(line) // This will just be "$" if showEnds is true
+					}
+				} else if catFlags.numberLines {
+					fmt.Printf("%6d\t%s\n", lineNumber, line)
+					lineNumber++
+				} else {
+					fmt.Println(line)
+				}
 			}
 			if err := scanner.Err(); err != nil {
 				fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
@@ -42,9 +60,26 @@ var rootCmd = &cobra.Command{
 				scanner := bufio.NewScanner(os.Stdin)
 				for scanner.Scan() {
 					line := scanner.Text()
-					// TODO: Add flag logic here later
-					// For now, just print the line
-					fmt.Println(line)
+					originalLine := line
+					
+					// Add $ at end if showEnds flag is set
+					if catFlags.showEnds {
+						line += "$"
+					}
+					
+					if catFlags.numberNonBlank {
+						if len(originalLine) > 0 { // Check original line for emptiness
+							fmt.Printf("%6d\t%s\n", lineNumber, line)
+							lineNumber++
+						} else {
+							fmt.Println(line) // This will just be "$" if showEnds is true
+						}
+					} else if catFlags.numberLines {
+						fmt.Printf("%6d\t%s\n", lineNumber, line)
+						lineNumber++
+					} else {
+						fmt.Println(line)
+					}
 				}
 				if err := scanner.Err(); err != nil {
 					fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
@@ -62,9 +97,26 @@ var rootCmd = &cobra.Command{
 			scanner := bufio.NewScanner(file)
 			for scanner.Scan() {
 				line := scanner.Text()
-				// TODO: Add flag logic here later
-				// For now, just print the line
-				fmt.Println(line)
+				originalLine := line
+				
+				// Add $ at end if showEnds flag is set
+				if catFlags.showEnds {
+					line += "$"
+				}
+				
+				if catFlags.numberNonBlank {
+					if len(originalLine) > 0 { // Check original line for emptiness
+						fmt.Printf("%6d\t%s\n", lineNumber, line)
+						lineNumber++
+					} else {
+						fmt.Println(line) // This will just be "$" if showEnds is true
+					}
+				} else if catFlags.numberLines {
+					fmt.Printf("%6d\t%s\n", lineNumber, line)
+					lineNumber++
+				} else {
+					fmt.Println(line)
+				}
 			}
 
 			if err := scanner.Err(); err != nil {
