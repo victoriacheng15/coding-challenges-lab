@@ -53,6 +53,17 @@ func processInput(reader io.Reader, lineNumber *int) error {
 	return scanner.Err()
 }
 
+// processFile opens and processes a single file
+func processFile(filename string, lineNumber *int) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	return processInput(file, lineNumber)
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "cat-go [flag] [file...]",
 	Short: "Concatenate files and print to standard output",
@@ -76,15 +87,8 @@ var rootCmd = &cobra.Command{
 				continue
 			}
 
-			file, err := os.Open(filename)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error opening file %s: %v\n", filename, err)
-				continue
-			}
-			defer file.Close()
-
-			if err := processInput(file, &lineNumber); err != nil {
-				fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", filename, err)
+			if err := processFile(filename, &lineNumber); err != nil {
+				fmt.Fprintf(os.Stderr, "Error processing file %s: %v\n", filename, err)
 			}
 		}
 	},
