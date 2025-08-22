@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -16,6 +17,42 @@ type Flags struct {
 
 var catFlags Flags
 
+// formatLine applies the formatting flags to a line and returns the formatted output
+func formatLine(line string, lineNumber *int) string {
+	originalLine := line
+	
+	// Add $ at end if showEnds flag is set
+	if catFlags.showEnds {
+		line += "$"
+	}
+	
+	if catFlags.numberNonBlank {
+		if len(originalLine) > 0 { // Check original line for emptiness
+			result := fmt.Sprintf("%6d\t%s", *lineNumber, line)
+			*lineNumber++
+			return result
+		} else {
+			return line // This will just be "$" if showEnds is true
+		}
+	} else if catFlags.numberLines {
+		result := fmt.Sprintf("%6d\t%s", *lineNumber, line)
+		*lineNumber++
+		return result
+	} else {
+		return line
+	}
+}
+
+// processInput reads from an io.Reader and processes each line
+func processInput(reader io.Reader, lineNumber *int) error {
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fmt.Println(formatLine(line, lineNumber))
+	}
+	return scanner.Err()
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "cat-go [flag] [file...]",
 	Short: "Concatenate files and print to standard output",
@@ -24,31 +61,7 @@ var rootCmd = &cobra.Command{
 		lineNumber := 1
 		if len(args) == 0 {
 			// Read from standard input
-			scanner := bufio.NewScanner(os.Stdin)
-			for scanner.Scan() {
-				line := scanner.Text()
-				originalLine := line
-				
-				// Add $ at end if showEnds flag is set
-				if catFlags.showEnds {
-					line += "$"
-				}
-				
-				if catFlags.numberNonBlank {
-					if len(originalLine) > 0 { // Check original line for emptiness
-						fmt.Printf("%6d\t%s\n", lineNumber, line)
-						lineNumber++
-					} else {
-						fmt.Println(line) // This will just be "$" if showEnds is true
-					}
-				} else if catFlags.numberLines {
-					fmt.Printf("%6d\t%s\n", lineNumber, line)
-					lineNumber++
-				} else {
-					fmt.Println(line)
-				}
-			}
-			if err := scanner.Err(); err != nil {
+			if err := processInput(os.Stdin, &lineNumber); err != nil {
 				fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
 			}
 			return
@@ -57,31 +70,7 @@ var rootCmd = &cobra.Command{
 		for _, filename := range args {
 			if filename == "-" {
 				// Read from standard input when "-" is specified
-				scanner := bufio.NewScanner(os.Stdin)
-				for scanner.Scan() {
-					line := scanner.Text()
-					originalLine := line
-					
-					// Add $ at end if showEnds flag is set
-					if catFlags.showEnds {
-						line += "$"
-					}
-					
-					if catFlags.numberNonBlank {
-						if len(originalLine) > 0 { // Check original line for emptiness
-							fmt.Printf("%6d\t%s\n", lineNumber, line)
-							lineNumber++
-						} else {
-							fmt.Println(line) // This will just be "$" if showEnds is true
-						}
-					} else if catFlags.numberLines {
-						fmt.Printf("%6d\t%s\n", lineNumber, line)
-						lineNumber++
-					} else {
-						fmt.Println(line)
-					}
-				}
-				if err := scanner.Err(); err != nil {
+				if err := processInput(os.Stdin, &lineNumber); err != nil {
 					fmt.Fprintf(os.Stderr, "Error reading from stdin: %v\n", err)
 				}
 				continue
@@ -94,32 +83,7 @@ var rootCmd = &cobra.Command{
 			}
 			defer file.Close()
 
-			scanner := bufio.NewScanner(file)
-			for scanner.Scan() {
-				line := scanner.Text()
-				originalLine := line
-				
-				// Add $ at end if showEnds flag is set
-				if catFlags.showEnds {
-					line += "$"
-				}
-				
-				if catFlags.numberNonBlank {
-					if len(originalLine) > 0 { // Check original line for emptiness
-						fmt.Printf("%6d\t%s\n", lineNumber, line)
-						lineNumber++
-					} else {
-						fmt.Println(line) // This will just be "$" if showEnds is true
-					}
-				} else if catFlags.numberLines {
-					fmt.Printf("%6d\t%s\n", lineNumber, line)
-					lineNumber++
-				} else {
-					fmt.Println(line)
-				}
-			}
-
-			if err := scanner.Err(); err != nil {
+			if err := processInput(file, &lineNumber); err != nil {
 				fmt.Fprintf(os.Stderr, "Error reading file %s: %v\n", filename, err)
 			}
 		}
