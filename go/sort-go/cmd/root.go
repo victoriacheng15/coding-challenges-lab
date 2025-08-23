@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"bufio"
 	"sort"
+	"math/rand"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -170,6 +172,11 @@ var rootCmd = &cobra.Command{
 			}
 			sort.Strings(result)
 			lines = result
+		} else if sortFlags.RandomSort {
+			rand.Seed(time.Now().UnixNano())
+			rand.Shuffle(len(lines), func(i, j int) {
+				lines[i], lines[j] = lines[j], lines[i]
+			})
 		} else if sortFlags.SortMethod == "merge" {
 			lines = mergeSort(lines)
 		} else if sortFlags.SortMethod == "quick" {
