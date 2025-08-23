@@ -29,20 +29,23 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
+		var scanner *bufio.Scanner
+		
 		if len(args) == 0 {
-			fmt.Fprintf(os.Stderr, "Error: no input file provided\n")
-			return
+			// Read from stdin
+			scanner = bufio.NewScanner(os.Stdin)
+		} else {
+			// Read from file
+			file, err := os.Open(args[0])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error opening file %q: %v\n", args[0], err)
+				return
+			}
+			defer file.Close()
+			scanner = bufio.NewScanner(file)
 		}
 
-		file, err := os.Open(args[0])
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error opening file %q: %v\n", args[0], err)
-			return
-		}
-		defer file.Close()
-
-		// Read lines from file
-		scanner := bufio.NewScanner(file)
+		// Read lines from input source
 		var lines []string
 		for scanner.Scan() {
 			lines = append(lines, scanner.Text())
@@ -52,8 +55,22 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		// Sort lines lexicographically
-		sort.Strings(lines)
+		if sortFlags.RemoveDuplicates {
+			unique := make(map[string]bool)
+			var result []string
+			for _, line := range lines {
+				if !unique[line] {
+					unique[line] = true
+					result = append(result, line)
+				}
+			}
+
+			sort.Strings(result)
+			lines = result
+		} else {
+			// Sort lines lexicographically
+			sort.Strings(lines)
+		}
 
 		// Output sorted lines
 		for _, line := range lines {
