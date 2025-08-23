@@ -88,7 +88,7 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolVarP(&sortFlags.RemoveDuplicates, "remove-duplicates", "u", false, "Remove duplicate lines")
-	rootCmd.Flags().StringVarP(&sortFlags.SortMethod, "sort-method", "s", "merge", "Sorting method (merge, quick, binarysearch)")
+	rootCmd.Flags().StringVarP(&sortFlags.SortMethod, "sort-method", "s", "merge", "Sorting method (merge, quick, binary)")
 	rootCmd.Flags().BoolVarP(&sortFlags.RandomSort, "random-sort", "R", false, "Randomize output order")
 }
 
