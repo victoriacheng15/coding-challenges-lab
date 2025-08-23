@@ -1,67 +1,61 @@
-# Coding Challenges - Build Your Own wc Tool
+# wc-go
 
-This is a go version of the Unix `wc` command. It allows you to count bytes, lines, words, and characters from a file or input stream. The porject is built with test-driven development in mind.
+A simple CLI tool written in Go to count lines, words, and bytes in files or standard input, similar to the Unix `wc` command.
 
-## What I learned
-
-Through this project, I explored:
-
-- How to design and build a CLI tool using Cobra
-- Writing tests first to guide development (TDD)
-- Parsing and handling input from both files and streams
-- Structuring Go code for maintainability and clarity
+## Features
+- Count lines, words, and bytes from one or more files, or from standard input
+- Display counts for each file and a total when multiple files are provided
+- Supports flags to show only lines (`-l`), words (`-w`), or bytes (`-c`)
+- Combine flags for custom output
 
 ## Installation
 
-1. Clone the repository:
+Clone the repo and build:
 
-```bash
-git clone git@github.com:victoriacheng15/coding-challenges-lab.git
-```
-
-2. Navigate to the project directory:
-
-```bash
+```sh
+git clone <repo-url>
 cd go/wc-go
+go build -o wc-go
 ```
 
-3. Download modules
+## Usage
 
-```bash
-go mod download
-
-# tidy to ensure go.mod/go.sum are consistent
-go mod tidy
+```sh
+wc-go [flags] [file...]
 ```
 
-43. Build
+### Examples
 
-```bash
-go build ccwc main.go
-```
-
-54. Run the command
-
-```bash
-./ccwc test.txt
-```
-
-```bash
-./ccwc -l test.txt
-```
-
-```bash
-./ccwc -w test.txt
-```
-
-```bash
-./ccwc -c test.txt
-```
-
-
-```bash
-./ccwc -m test.txt
-```
+- Count lines, words, and bytes in a file:
+  ```sh
+  wc-go test.txt
+  ```
+- Count in multiple files:
+  ```sh
+  wc-go file1.txt file2.txt
+  ```
+- Read from standard input:
+  ```sh
+  echo "hello world" | wc-go
+  ```
+- Show only line count:
+  ```sh
+  wc-go -l test.txt
+  ```
+- Show only word count:
+  ```sh
+  wc-go -w test.txt
+  ```
+- Show only byte count:
+  ```sh
+  wc-go -c test.txt
+  ```
+- Combine flags:
+  ```sh
+  wc-go -lw test.txt
+  wc-go -lc test.txt
+  wc-go -wc test.txt
+  ```
 
 ## Links:
 - [Coding Challenges Website](https://codingchallenges.fyi/)
