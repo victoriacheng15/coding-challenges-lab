@@ -1,15 +1,14 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"os"
-	"fmt"
 	"bufio"
-	"sort"
+	"fmt"
 	"math/rand"
+	"os"
+	"sort"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -47,16 +46,17 @@ func randomize(lines []string) []string {
 
 func processContent(args []string) ([]string, error) {
 	var scanner *bufio.Scanner
-	
+
 	if len(args) == 0 {
 		// Read from stdin
 		scanner = bufio.NewScanner(os.Stdin)
 	} else {
 		// Read from file
-		file, err := os.Open(args[0]); if err != nil {
+		file, err := os.Open(args[0])
+		if err != nil {
 			return nil, fmt.Errorf("error opening file %q: %v", args[0], err)
 		}
-		
+
 		defer file.Close()
 		scanner = bufio.NewScanner(file)
 	}
@@ -76,26 +76,27 @@ func processContent(args []string) ([]string, error) {
 var rootCmd = &cobra.Command{
 	Use:   "sort-go",
 	Short: "A brief description of your application",
-	Long: `Sort-go is a command-line tool that sorts lines from a specified file using different sorting algorithms, including lexicographical, unique, and random sort. It supports options for removing duplicates, choosing the sorting method, and randomizing output, making it a flexible utility for text processing and experimentation. Designed for extensibility and learning, sort-go helps users understand sorting techniques and command-line application development in Go.`,
+	Long:  `Sort-go is a command-line tool that sorts lines from a specified file using different sorting algorithms, including lexicographical, unique, and random sort. It supports options for removing duplicates, choosing the sorting method, and randomizing output, making it a flexible utility for text processing and experimentation. Designed for extensibility and learning, sort-go helps users understand sorting techniques and command-line application development in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		lines, err := processContent(args); if err != nil {
+		lines, err := processContent(args)
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			return
 		}
 
 		switch {
-			case sortFlags.RemoveDuplicates:
-				lines = removeDuplicates(lines)
-			case sortFlags.RandomSort:
-				lines = randomize(lines)
-			case sortFlags.SortMethod == "merge":
-				lines = utils.MergeSort(lines)
-			case sortFlags.SortMethod == "quick":
-				lines = utils.QuickSort(lines)
-			case sortFlags.SortMethod == "heap":
-				lines = utils.HeapSort(lines)
-			default:
-				sort.Strings(lines)
+		case sortFlags.RemoveDuplicates:
+			lines = removeDuplicates(lines)
+		case sortFlags.RandomSort:
+			lines = randomize(lines)
+		case sortFlags.SortMethod == "merge":
+			lines = utils.MergeSort(lines)
+		case sortFlags.SortMethod == "quick":
+			lines = utils.QuickSort(lines)
+		case sortFlags.SortMethod == "heap":
+			lines = utils.HeapSort(lines)
+		default:
+			sort.Strings(lines)
 		}
 
 		for _, line := range lines {
@@ -116,5 +117,3 @@ func init() {
 	rootCmd.Flags().StringVarP(&sortFlags.SortMethod, "sort-method", "s", "merge", "Sorting method (merge, quick, heap)")
 	rootCmd.Flags().BoolVarP(&sortFlags.RandomSort, "random-sort", "R", false, "Randomize output order")
 }
-
-
