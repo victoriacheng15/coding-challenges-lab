@@ -15,7 +15,7 @@ A simple CLI tool written in Go to concatenate files and print to standard outpu
 Clone the repo and build:
 
 ```sh
-git clone <repo-url>
+git clone git@github.com:victoriacheng15/coding-challenges-lab.git
 cd go/cat-go
 go build -o cat-go
 ```
