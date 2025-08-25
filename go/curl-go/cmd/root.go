@@ -4,6 +4,9 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"crypto/tls"
+	"io"
+	"net"
 	"net/url"
 	"os"
 	"strings"
@@ -51,6 +54,8 @@ var rootCmd = &cobra.Command{
 		port := u.Port()
 		if port == "" && protocol == "http" {
 			port = "80"
+		} else if port == "" && protocol == "https" {
+			port = "443"
 		}
 		path := u.EscapedPath()
 		if path == "" {
@@ -60,6 +65,58 @@ var rootCmd = &cobra.Command{
 		cmd.Printf("Sending request GET %s HTTP/1.1\n", path)
 		cmd.Printf("Host: %s\n", host)
 		cmd.Println("Accept: */*")
+		cmd.Println("Connection: close")
+
+		// Build the HTTP request string
+		request := "GET " + path + " HTTP/1.1\r\n" +
+			"Host: " + host + "\r\n" +
+			"Accept: */*\r\n" +
+			"Connection: close\r\n" +
+			"\r\n"
+
+		// Open TCP connection
+		address := host + ":" + port
+		var conn net.Conn
+		if protocol == "https" {
+			// For HTTPS, use TLS
+			tlsConn, err := tls.Dial("tcp", address, nil)
+			if err != nil {
+				cmd.Println("Failed to connect:", err)
+				return
+			}
+			conn = tlsConn
+		} else {
+			tcpConn, err := net.Dial("tcp", address)
+			if err != nil {
+				cmd.Println("Failed to connect:", err)
+				return
+			}
+			conn = tcpConn
+		}
+		defer conn.Close()
+
+		// Send request
+		_, err = conn.Write([]byte(request))
+		if err != nil {
+			cmd.Println("Failed to send request:", err)
+			return
+		}
+
+		// Read response
+		buf := make([]byte, 4096)
+		for {
+			n, err := conn.Read(buf)
+			if n > 0 {
+				os.Stdout.Write(buf[:n])
+			}
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				cmd.Printf("Read error: %v\n", err)
+				break
+			}
+		}
 	},
 }
 
