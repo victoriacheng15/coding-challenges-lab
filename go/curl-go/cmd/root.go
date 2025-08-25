@@ -4,6 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"crypto/tls"
 	"io"
 	"net"
@@ -35,20 +36,20 @@ var rootCmd = &cobra.Command{
 		curl-go -X POST http://example.com -d '{"key":"value"}' -H "Content-Type: application/json"
 		curl-go -v http://example.com
 	`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			cmd.Println("curl-go: no URL specified!")
 			cmd.Println("curl-go: try 'curl-go --help' for more information")
 			return
 		}
+
 		rawURL := args[0]
 		u, err := parseURL(rawURL)
 		if err != nil {
 			cmd.Println("Invalid URL:", err)
 			return
 		}
+
 		protocol := u.Scheme
 		host := u.Hostname()
 		port := u.Port()
@@ -61,34 +62,51 @@ var rootCmd = &cobra.Command{
 		if path == "" {
 			path = "/"
 		}
+
+		verbose, _ := cmd.Flags().GetBool("verbose")
+
+		// determine host header (include port if nonstandard)
+		hostHeader := host
+		if (protocol == "http" && port != "80") || (protocol == "https" && port != "443") {
+			hostHeader = host + ":" + port
+		}
+
 		cmd.Println("connecting to", host)
-		cmd.Printf("Sending request GET %s HTTP/1.1\n", path)
-		cmd.Printf("Host: %s\n", host)
-		cmd.Println("Accept: */*")
-		cmd.Println("Connection: close")
+		if verbose {
+			cmd.Printf("> GET %s HTTP/1.1\n", path)
+			cmd.Printf("> Host: %s\n", hostHeader)
+			cmd.Printf("> Accept: */*\n")
+			cmd.Printf("> Connection: close\n")
+			cmd.Println(">")
+		} else {
+			cmd.Printf("Sending request GET %s HTTP/1.1\n", path)
+			cmd.Printf("Host: %s\n", hostHeader)
+			cmd.Println("Accept: */*")
+			cmd.Println("Connection: close")
+		}
 
 		// Build the HTTP request string
 		request := "GET " + path + " HTTP/1.1\r\n" +
-			"Host: " + host + "\r\n" +
+			"Host: " + hostHeader + "\r\n" +
 			"Accept: */*\r\n" +
 			"Connection: close\r\n" +
 			"\r\n"
 
 		// Open TCP connection
-		address := host + ":" + port
+		address := net.JoinHostPort(host, port)
 		var conn net.Conn
 		if protocol == "https" {
 			// For HTTPS, use TLS
 			tlsConn, err := tls.Dial("tcp", address, nil)
 			if err != nil {
-				cmd.Println("Failed to connect:", err)
+				cmd.PrintErrln("Failed to connect:", err)
 				return
 			}
 			conn = tlsConn
 		} else {
 			tcpConn, err := net.Dial("tcp", address)
 			if err != nil {
-				cmd.Println("Failed to connect:", err)
+				cmd.PrintErrln("Failed to connect:", err)
 				return
 			}
 			conn = tcpConn
@@ -98,24 +116,54 @@ var rootCmd = &cobra.Command{
 		// Send request
 		_, err = conn.Write([]byte(request))
 		if err != nil {
-			cmd.Println("Failed to send request:", err)
+			cmd.PrintErrln("Failed to send request:", err)
 			return
 		}
 
-		// Read response
-		buf := make([]byte, 4096)
+		// Read response: parse headers then stream body
+		reader := bufio.NewReader(conn)
+
+		// Status line
+		statusLine, err := reader.ReadString('\n')
+		if err != nil {
+			cmd.PrintErrln("Failed to read response:", err)
+			return
+		}
+		if verbose {
+			cmd.Printf("< %s", statusLine)
+		} else {
+			os.Stdout.WriteString(statusLine)
+		}
+
+		// Headers
 		for {
-			n, err := conn.Read(buf)
-			if n > 0 {
-				os.Stdout.Write(buf[:n])
-			}
+			line, err := reader.ReadString('\n')
 			if err != nil {
-				if err == io.EOF {
-					break
+				cmd.PrintErrln("Failed to read headers:", err)
+				return
+			}
+			if line == "\r\n" || line == "\n" {
+				// end of headers
+				if verbose {
+					cmd.Println("<")
+				} else {
+					os.Stdout.WriteString("\n")
 				}
-				cmd.Printf("Read error: %v\n", err)
 				break
 			}
+			if verbose {
+				// print header lines with '< ' prefix
+				// Use Printf to avoid double newlines
+				cmd.Printf("< %s", line)
+			} else {
+				os.Stdout.WriteString(line)
+			}
+		}
+
+		// Body: stream remaining data
+		_, err = io.Copy(os.Stdout, reader)
+		if err != nil && err != io.EOF {
+			cmd.PrintErrln("Error reading body:", err)
 		}
 	},
 }
@@ -130,14 +178,5 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.curl-go.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolP("verbose", "v", false, "Enable verbose output")
 }
